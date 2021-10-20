@@ -4,7 +4,7 @@ var router = express.Router();
 const user = require('../dao/users_dao')
 /* GET users listing. */
 router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
+  res.send('respond with a user');
 });
 // 用户登录
 router.post('/login', function (req, res) {
@@ -18,4 +18,19 @@ router.get('/getUserDataById', function (req, res) {
 router.get('/getUsersByTypePage', function (req, res) {
   user.getUsersByTypePage(req, res)
 })
+
+/**
+ *  用户删除)(同时清空该用户阅读记录)
+ */
+router.get('/delUserdata', function (req, res, next) {
+  if (req.query.u_id == 0) res.send('管理员不可以进行删除')
+  else user.delUserdata(req, res)
+});
+
+/**
+ * 用户修改
+ */
+router.post('/upUserdata', function (req, res, next) {
+  user.upUserdata(req, res)
+});
 module.exports = router;

@@ -2,7 +2,6 @@ const query = require('express/lib/middleware/query');
 const { token } = require('morgan');
 const path = require('path')
 const jwtUtil = require('../utils/jwtUtils')
-global.globalKey = '123456'
 module.exports = class users_dao extends require('../model/users_mod') {
     static async Login(req, res) {
         let body = req.query;
@@ -12,7 +11,8 @@ module.exports = class users_dao extends require('../model/users_mod') {
                 id: loginData[0].id,
                 username: loginData[0].username,
                 head: loginData[0].head,
-                type: loginData[0].type
+                type: loginData[0].type,
+                classes: loginData[0].classes
             }, global.globalKey, 3600)
 
             res.send({ loginData, token });
@@ -30,5 +30,29 @@ module.exports = class users_dao extends require('../model/users_mod') {
         let data = await this.getUsersByType(query.type, query.pageNum, query.currPage);
         let total = await this.getUserByTypeTotal(query.type)
         res.send({ data, total: total[0] })
+    }
+
+    /**
+    * 用户删除)(同时清空该用户阅读记录)
+    */
+
+    static async delUserdata(req, res) {
+        let query = req.query;
+        let result = await this.delUserdataMod(query.u_id);
+        let result1 = await this.delUserdataRead(query.u_id);
+        result = result + result1
+        res.send(result)
+    }
+
+    /**
+     * 用户修改
+     * @param {*} req 
+     * @param {*} res 
+     */
+    static async upUserdata(req, res) {
+        let query = req.query;
+        console.log(query);
+        let data = await this.upUserdataMod(query.u_id, query.username, query.sex, query.address, query.type)
+        res.send(data)
     }
 }

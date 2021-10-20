@@ -1,3 +1,4 @@
+const tools = require('../utils/tools')
 module.exports = class users_mod extends require('./model') {
     /**
      * 数据库登录
@@ -44,4 +45,40 @@ module.exports = class users_mod extends require('./model') {
         })
     }
 
+    /**
+     *用户删除)(同时清空该用户阅读记录)
+     *
+     * @static
+     * @param {*} id
+     */
+    static delUserdataMod(id) {
+        return new Promise((resolve, reject) => {
+            let sql = "delete from user where id=" + id
+            this.query(sql).then(res => { resolve("删除用户成功！") }).catch(err => { reject("删除用户失败！") })
+        })
+    }
+
+    static delUserdataRead(id) {
+        return new Promise((resolve, reject) => {
+            let sql = "delete from `read` where u_id=" + id
+            console.log(sql)
+            this.query(sql).then(res => { resolve("---删除用户阅读记录成功！") }).catch(err => { reject("---删除用户阅读记录失败！") })
+        })
+    }
+
+    /**
+     * 管理员进行用户信息修改
+     * @param {*} id 
+     * @param {*} username 
+     * @param {*} sex 
+     * @param {*} address 
+     * @param {*} type 
+     */
+    static upUserdataMod(id, username, sex, address, type) {
+        return new Promise((resolve, reject) => {
+            let currentTime = tools.getDate19()
+            let sql = 'UPDATE `user` SET username="' + username + '",  sex ="' + sex + '" , address= "' + address + '" , type="' + type + '",modifytime="' + currentTime + '" WHERE id = ' + id
+            this.query(sql).then(res => { resolve("更新成功") }).catch(err => { reject("更新失败") })
+        })
+    }
 }
