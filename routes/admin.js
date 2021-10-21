@@ -20,4 +20,20 @@ router.post('/announce', function (req, res, next) {
 router.get('/getAllNotice', function (req, res, next) {
     admin.getAllNotice(req, res)
 });
+
+
+/* 获取该用户所属班级的全部请假单与数量(分页查询) */
+router.get('/getLeave', function (req, res, next) {
+    admin.getLeave(req, res)
+});
+
+/*  获取该用户请假审批与数量(分页) */
+router.get('/getuserLeave', function (req, res, next) {
+    admin.getuserLeave(req, res)
+});
+
+/*  当前请假单审批(修改审批状态)*/
+router.get('/upLeaveState', function (req, res, next) {
+    admin.upLeaveState(req, res)
+});
 module.exports = router;

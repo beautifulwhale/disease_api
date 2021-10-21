@@ -51,8 +51,22 @@ module.exports = class users_dao extends require('../model/users_mod') {
      */
     static async upUserdata(req, res) {
         let query = req.query;
-        console.log(query);
         let data = await this.upUserdataMod(query.u_id, query.username, query.sex, query.address, query.type)
         res.send(data)
+    }
+
+    /**
+     *更新用户密码
+     *
+     * @static
+     * @param {*} req
+     * @param {*} res
+     */
+    static async upPwd(req, res) {
+        let u_id = req.query.u_id;
+        let oldpassword = req.query.oldpassword;
+        let newpassword = req.query.newpassword;
+        let result = await this.upPwdMod(u_id, oldpassword, newpassword);
+        res.send(result);
     }
 }

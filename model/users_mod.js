@@ -61,7 +61,6 @@ module.exports = class users_mod extends require('./model') {
     static delUserdataRead(id) {
         return new Promise((resolve, reject) => {
             let sql = "delete from `read` where u_id=" + id
-            console.log(sql)
             this.query(sql).then(res => { resolve("---删除用户阅读记录成功！") }).catch(err => { reject("---删除用户阅读记录失败！") })
         })
     }
@@ -79,6 +78,22 @@ module.exports = class users_mod extends require('./model') {
             let currentTime = tools.getDate19()
             let sql = 'UPDATE `user` SET username="' + username + '",  sex ="' + sex + '" , address= "' + address + '" , type="' + type + '",modifytime="' + currentTime + '" WHERE id = ' + id
             this.query(sql).then(res => { resolve("更新成功") }).catch(err => { reject("更新失败") })
+        })
+    }
+
+    /**
+     *更新用户密码
+     *
+     * @static
+     * @param {*} id
+     * @param {*} oldpassword
+     * @param {*} newpassword
+     */
+    static upPwdMod(id, oldpassword, newpassword) {
+        id = Number(id);
+        return new Promise((resolve, reject) => {
+            let sql = "update `user` set password = ? where password = ? and id = ?"
+            this.query(sql, this.formParams(newpassword, oldpassword, id)).then(res => { resolve(res) }).catch(err => { reject(err) })
         })
     }
 }

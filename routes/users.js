@@ -33,4 +33,11 @@ router.get('/delUserdata', function (req, res, next) {
 router.post('/upUserdata', function (req, res, next) {
   user.upUserdata(req, res)
 });
+
+/**
+ * 更新用户密码
+ */
+router.post('/upPwd', function (req, res, next) {
+  user.upPwd(req, res)
+});
 module.exports = router;

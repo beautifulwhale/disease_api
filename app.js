@@ -15,7 +15,7 @@ global.globalKey = '123456'
 /**
  * 全系统允许跨域处理 这段配置要再new出express实例的时候就要设置了，放在所有的api前面，不然没有效果
  */
- app.all("*", function (req, res, next) {
+app.all("*", function (req, res, next) {
   //设置允许跨域的域名，*代表允许任意域名跨域
   res.header("Access-Control-Allow-Origin", "*");
   //允许的header类型
@@ -23,9 +23,9 @@ global.globalKey = '123456'
   //跨域允许的请求方式
   res.header("Access-Control-Allow-Methods", "*");
   if (req.method.toLowerCase() == 'options')
-      res.send(200);  //让options尝试请求快速结束
+    res.send(200);  //让options尝试请求快速结束
   else
-      next();
+    next();
 });
 
 // view engine setup
@@ -38,18 +38,56 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const jwtUtil = require('./utils/jwtUtils')
+app.use(async function (req, res, next) {
+  let token = req.query.token;
+  let path = req.path
+  if (path.startsWith('/users')) {
+    if (path.startsWith('/users/login') || path.startsWith('/users/getUsersByTypePage')) {
+      next()
+      return
+    } else {
+      let verify = await jwtUtil.verifysync(token, globalKey);
+      if (verify.err) {
+        res.status(401).send('请先进行登录');
+        return
+      } else {
+        next();
+        return
+      }
+    }
+  }
+  if (path.startsWith('/students')) {
+    if (path.startsWith("/students/gethealthNowDayPage")) {
+      next();
+      return
+    } else {
+      let verify = await jwtUtil.verifysync(token, globalKey);
+      if (verify.err) {
+        res.status(401).send('请先进行登录');
+        return
+      } else {
+        next();
+        return
+      }
+    }
+  }
+})
+
+
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/students', studentsRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

@@ -44,7 +44,7 @@ function verifysync(token, secretkey) {
         jwt.verify(token, secretkey, function (err, decode) {
             if (err) {
                 console.log(err.message);
-                resolve({ err: 'error', msg: '绘画已过期' })
+                resolve({ err: 'error', msg: 'token已过期' })
             } else {
                 console.log("解密成功")
                 resolve(decode)

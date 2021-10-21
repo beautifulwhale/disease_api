@@ -70,4 +70,99 @@ module.exports = class admin_mod extends require('./model') {
             this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
         })
     }
+
+    /**
+  *获取该用户所属班级的全部请假单与数量(分页查询)
+  *
+  * @static
+  * @param {*} id
+  * @param {*} classes
+  * @param {*} pageNum
+  * @param {*} currPage
+  */
+    static getLeaveMod(classArr, pageNum, currPage) {
+        pageNum = Number(pageNum)
+        currPage = Number(currPage)
+        currPage = Number(currPage * pageNum);
+        return new Promise((resolve, reject) => {
+            let sql = "select * from `leave` where classes = "
+            for (let i = 0; i < classArr.length; i++) {
+                if (i == 0) sql += " '" + classArr[i] + "' "
+                else sql += " or classes= '" + classArr[i] + "' "
+            }
+            sql += " order by createtime desc limit  " + currPage + " , " + pageNum;
+            console.log(sql);
+            this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
+        })
+    }
+
+    static getLeaveTotal(classArr) {
+        return new Promise((resolve, reject) => {
+            let sql = "select count(1) as count   from `leave` where classes = "
+            for (let i = 0; i < classArr.length; i++) {
+                if (i == 0) sql += " '" + classArr[i] + "' "
+                else sql += " or classes= '" + classArr[i] + "' "
+            }
+            console.log(sql)
+            this.query(sql).then(result => {
+                resolve(result)
+            }).catch(err => {
+                reject("您没有学生请假")
+            })
+        })
+    }
+
+    /**
+     *获取该用户请假审批与数量(分页)
+     *
+     * @static
+     * @param {*} id
+     * @param {*} pageNum
+     * @param {*} currPage
+     */
+    static getuserLeaveMod(u_id, pageNum, currPage) {
+        pageNum = Number(pageNum)
+        currPage = Number(currPage)
+        currPage = Number(currPage * pageNum);
+        return new Promise((resolve, reject) => {
+            let sql = "select * from `leave` where u_id= ? order by createtime desc limit ?,? "
+            this.query(sql, this.formParams(u_id, currPage, pageNum)).then(result => {
+                resolve(result)
+            }).catch(err => {
+                reject("您没有请假记录")
+            })
+        })
+    }
+
+    static getuserLeaveTotal(u_id) {
+        return new Promise((resolve, reject) => {
+            let sql = "select count(1) as count  from `leave` where u_id= ? "
+            this.query(sql, this.formParams(u_id)).then(result => {
+                resolve(result)
+            }).catch(err => {
+                reject("您没有请假记录")
+            })
+        })
+    }
+
+    /**
+     *当前请假单审批(修改审批状态)
+     *
+     * @static
+     * @param {*} id
+     * @param {*} state
+     */
+    static upLeaveStateMod(id, state) {
+        id = Number(id)
+        state = Number(state);
+        return new Promise((resolve, reject) => {
+            let sql = "update `leave` set state = ? where l_id = ? "
+            console.log(sql)
+            this.query(sql, this.formParams(state, id)).then(result => {
+                resolve("状态修改成功")
+            }).catch(err => {
+                reject("状态修改失败")
+            })
+        })
+    }
 }
