@@ -91,7 +91,6 @@ module.exports = class admin_mod extends require('./model') {
                 else sql += " or classes= '" + classArr[i] + "' "
             }
             sql += " order by createtime desc limit  " + currPage + " , " + pageNum;
-            console.log(sql);
             this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
         })
     }
@@ -144,7 +143,6 @@ module.exports = class admin_mod extends require('./model') {
             })
         })
     }
-
     /**
      *当前请假单审批(修改审批状态)
      *
@@ -163,6 +161,137 @@ module.exports = class admin_mod extends require('./model') {
             }).catch(err => {
                 reject("状态修改失败")
             })
+        })
+    }
+
+
+    /*****************************************增值功能******************************************/
+
+    //当前公告已读人数
+    static getReadNumber(n_id) {
+        n_id = Number(n_id)
+        return new Promise((resolve, reject) => {
+            let sql = "select count(1) as count from `read` where n_id=" + n_id
+            this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
+        })
+    }
+
+    /**
+     *当前公告查看详情
+     *
+     * @param {*} n_id
+     */
+    static NoticeDetailsMod(n_id) {
+        n_id = Number(n_id)
+        return new Promise((resolve, reject) => {
+            let sql = "select * from `notice` where n_id=" + n_id
+            this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
+        })
+    }
+
+    //阅读公告的用户ID
+    static getUserIdByRead(n_id) {
+        n_id = Number(n_id)
+        return new Promise((resolve, reject) => {
+            let sql = "select u_id from `read` where n_id=" + n_id
+            this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
+        })
+    }
+
+    //获取用户详细信息
+    static getUserInfo(readUserIdArr) {
+        return new Promise((resolve, reject) => {
+            let sql = ""
+            for (let i = 0; i < readUserIdArr.length; i++) {
+                if (i == 0)
+                    sql += "select id,username,head,classes,createtime from `user` where  id=  " + readUserIdArr[i].u_id
+                else
+                    sql += " or id= " + readUserIdArr[i].u_id
+            }
+            this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
+        })
+    }
+
+    //当前公告发布通知总人数
+    static NoticeDetailsTotal(classes) {
+        return new Promise((resolve, reject) => {
+            let sql = ""
+            let classesArr = classes.split(";")
+            for (let i = 0; i < classesArr.length; i++) {
+                if (i == 0)
+                    sql += "select count(1) as count from `user` where classes= '" + classesArr[i] + "'"
+                else
+                    sql += " or classes = '" + classesArr[i] + "'"
+            }
+            this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
+        })
+    }
+
+    /**
+     *当前 公告删除功能(同时清空该公告的被阅读记录)
+     *
+     * @static
+     * @param {*} id
+     */
+    static delNoticeMod(id) {
+        return new Promise((resolve, reject) => {
+            let sql = "delete from `notice` where n_id=" + id
+            this.query(sql).then(res => { resolve("删除公告成功") }).catch(err => { reject("删除公告失败") })
+        })
+    }
+
+    /**
+     *添加专业和班级
+     *
+     * @static
+     * @param {*} classes
+     */
+    static addClassesMod(classes) {
+        return new Promise((resolve, reject) => {
+            let sql = "INSERT INTO   `class` (classes) VALUES ('" + classes + "')"
+            this.query(sql).then(res => { resolve("添加班级成功") }).catch(err => { reject("添加班级失败") })
+        })
+    }
+
+    /**
+     *获取班级或者专业
+     *
+     * @static
+     */
+    static getClassesMod() {
+        return new Promise((resolve, reject) => {
+            let sql = "select * from `class` "
+            this.query(sql).then(res => { resolve(res) }).catch(err => { reject(err) })
+        })
+    }
+
+    /**
+     *模糊查询班级(分页获取数据与数量)
+     *
+     * @static
+     * @param {*} inputText
+     * @param {*} pageNum
+     * @param {*} currPage
+     */
+    static getClassesSearMod(inputText, pageNum, currPage) {
+        pageNum = Number(pageNum)
+        currPage = Number(currPage)
+        currPage = Number(pageNum * currPage)
+        return new Promise((resolve, reject) => {
+            let sql = "select * from `class` where classes like '%" + inputText + "%' limit ?,?"
+            console.log(sql)
+            this.query(sql, this.formParams(currPage, pageNum))
+                .then(res => { resolve(res) })
+                .catch(err => { reject(err) })
+        })
+    }
+
+    static getClassSearTotal(inputText) {
+        return new Promise((resolve, reject) => {
+            let sql = "select count(1) as count from `class` where classes like '%" + inputText + "%' "
+            this.query(sql)
+                .then(res => { resolve(res) })
+                .catch(err => { reject(err) })
         })
     }
 }

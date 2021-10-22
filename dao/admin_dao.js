@@ -91,4 +91,69 @@ module.exports = class admin_dao extends require('../model/adimin_mod') {
         res.send(result);
     }
 
+    /**
+     *当前公告查看详情
+     *
+     * @static
+     * @param {*} req
+     * @param {*} res
+     */
+    static async NoticeDetails(req, res) {
+        let readNum = await this.getReadNumber(req.query.n_id)
+        let readUserIdArr = await this.getUserIdByRead(req.query.n_id);
+        let data = await this.NoticeDetailsMod(req.query.n_id);
+        let total = await this.NoticeDetailsTotal(data[0].class);
+        total = total[0].count
+        let users = await this.getUserInfo(readUserIdArr);
+        res.send({ readNum: readNum[0].count, data, users, total })
+    }
+
+    /**
+     *当前 公告删除功能(同时清空该公告的被阅读记录)
+     *
+     * @static
+     * @param {*} req
+     * @param {*} res
+     */
+    static async delNotice(req, res) {
+        let data = await this.delNoticeMod(req.query.n_id);
+        res.send(data);
+    }
+
+    /**
+     *添加班级或者专业
+     *
+     * @static
+     * @param {*} req
+     * @param {*} res
+     */
+    static async addClasses(req, res) {
+        let data = await this.addClassesMod(req.query.classes)
+        res.send(data);
+    }
+
+    /**
+     *获取班级或者专业
+     *
+     * @static
+     * @param {*} req
+     * @param {*} res
+     */
+    static async getClasses(req, res) {
+        let data = await this.getClassesMod();
+        res.send(data);
+    }
+
+    /**
+     *模糊查询班级(分页获取数据与数量)
+     *
+     * @static
+     * @param {*} req
+     * @param {*} res
+     */
+    static async getClassesSear(req, res) {
+        let data = await this.getClassesSearMod(req.query.inputText, req.query.pageNum, req.query.currPage);
+        let total = await this.getClassSearTotal(req.query.inputText);
+        res.send({ data, total: total[0].count });
+    }
 }

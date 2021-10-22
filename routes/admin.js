@@ -36,4 +36,30 @@ router.get('/getuserLeave', function (req, res, next) {
 router.get('/upLeaveState', function (req, res, next) {
     admin.upLeaveState(req, res)
 });
+
+/*********************增值功能*****************/
+//当前公告查看详情
+router.get('/NoticeDetails', function (req, res, next) {
+    admin.NoticeDetails(req, res)
+});
+
+//当前 公告删除功能(同时清空该公告的被阅读记录)
+router.get('/delNotice', function (req, res, next) {
+    admin.delNotice(req, res)
+});
+
+//添加班级或者专业
+router.get('/addClasses', function (req, res, next) {
+    admin.addClasses(req, res)
+});
+
+//获取班级或者专业
+router.get('/getClasses', function (req, res, next) {
+    admin.getClasses(req, res)
+});
+
+//模糊查询班级(分页获取数据与数量)
+router.get('/getClassesSear', function (req, res, next) {
+    admin.getClassesSear(req, res)
+});
 module.exports = router;

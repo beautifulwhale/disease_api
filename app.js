@@ -39,40 +39,41 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const jwtUtil = require('./utils/jwtUtils')
-app.use(async function (req, res, next) {
-  let token = req.query.token;
-  let path = req.path
-  if (path.startsWith('/users')) {
-    if (path.startsWith('/users/login') || path.startsWith('/users/getUsersByTypePage')) {
-      next()
-      return
-    } else {
-      let verify = await jwtUtil.verifysync(token, globalKey);
-      if (verify.err) {
-        res.status(401).send('请先进行登录');
-        return
-      } else {
-        next();
-        return
-      }
-    }
-  }
-  if (path.startsWith('/students')) {
-    if (path.startsWith("/students/gethealthNowDayPage")) {
-      next();
-      return
-    } else {
-      let verify = await jwtUtil.verifysync(token, globalKey);
-      if (verify.err) {
-        res.status(401).send('请先进行登录');
-        return
-      } else {
-        next();
-        return
-      }
-    }
-  }
-})
+//拦截器(不能直接放行的先判断是否有token)
+// app.use(async function (req, res, next) {
+//   let token = req.query.token;
+//   let path = req.path
+//   if (path.startsWith('/users')) {
+//     if (path.startsWith('/users/login') || path.startsWith('/users/getUsersByTypePage')) {
+//       next()
+//       return
+//     } else {
+//       let verify = await jwtUtil.verifysync(token, globalKey);
+//       if (verify.err) {
+//         res.status(401).send('请先进行登录');
+//         return
+//       } else {
+//         next();
+//         return
+//       }
+//     }
+//   }
+//   if (path.startsWith('/students')) {
+//     if (path.startsWith("/students/gethealthNowDayPage")) {
+//       next();
+//       return
+//     } else {
+//       let verify = await jwtUtil.verifysync(token, globalKey);
+//       if (verify.err) {
+//         res.status(401).send('请先进行登录');
+//         return
+//       } else {
+//         next();
+//         return
+//       }
+//     }
+//   }
+// })
 
 
 
